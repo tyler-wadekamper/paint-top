@@ -4,10 +4,35 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Paint For Dummies</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="flex">
+    <div class="header body-child">PAINT FOR DUMMIES</div>
+    <div class="main-container body-child flex">
+        <div class="left-column-container flex">
+            <div class="eraser-button-container flex-item">
+                <button class="eraser-button">ERASER</button>
+            </div>
+            <div class="size-button-container flex-item">
+                <button class="size-button">SIZE</button>
+            </div>
+            <div class="clear-button-container flex-item">
+                <button class="clear-button">CLEAR</button>
+            </div>
+        </div>
+        <div class="grid-container"></div>
+        <div class="right-column-container flex">
+            <div class="color-button-row-container">
+                <div class="color-button-container">
+                    <button class=color-button>COLOR</button>
+                    <div class="color-picker"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <img class="footer body-child" src="images/dummy-guy.png" alt="">
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
     <script src="script.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,95 @@
+.flex {
+    display: flex;
+}
+
+body {
+    justify-content: space-between;
+    flex-direction: column;
+    background-color: #FBF304;
+    min-height: 100vh;
+    margin: 0px;
+    gap: 80px;
+}
+
+.header {
+    color: white;
+    background-color: black;
+    padding: 1em;
+    font-size: 72px;
+    text-align: center;
+    font-weight: bolder;
+}
+
+.body-child {
+    flex: 0;
+}
+
+button {
+    background-color: #FBF304;
+    border: solid black 7px;
+    color: black;
+    border-radius: 5px;
+    font-size: 24px;
+    font-weight: bolder;
+    padding: 10px 25px;
+    flex: 0;
+}
+
+button:hover, .pressed {
+    background-color: black;
+    color: white;
+}
+
+.footer {
+    flex: 0 0 auto;
+    height: 300px;
+    align-self: end;
+    position: relative;
+    bottom: 274px;
+}
+
+.grid-container {
+    border: solid black 7px;
+    border-radius: 7px;
+    width: 784px;
+    height: 784px;
+    display: grid;
+}
+
+.grid-cell {
+    box-sizing: border-box;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+/* .grid-cell:hover {
+    border: solid #b5b5b5 1px;
+} */
+
+.main-container {
+    justify-self: center;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.flex-item {
+    flex: 1;
+}
+
+.left-column-container, .right-column-container {
+    display: inline-block;
+    flex-direction: column;
+    gap: 20px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.color-picker {
+    background-color:#FBF304;
+    padding: 20px;
+    border-radius: 7px;
+}
