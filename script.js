@@ -6,45 +6,6 @@ class grid {
         this.numberOfCells = sideLength ** 2;
         this.previousColor = "#000000";
         this.cells = this.initCells(sideLength);
-        this.gridContainerDiv = this.getGridContainerDiv();
-        this.setGridContainerSideLength(this.sideLength);
-        this.appendToGridContainer(this.gridContainerDiv);
-        this.addMouseEventListeners();
-        this.buttonBoard = new buttonBoard(this);
-        this.colorPicker = this.initColorPicker();
-        this.addColorPickerEventListener(this.colorPicker);
-    }
-
-    getGridContainerDiv() {
-        return document.querySelector(".grid-container");
-    }
-
-    setGridContainerSideLength(sideLength) {
-        this.gridContainerDiv.style["grid-template-columns"] = `repeat(${sideLength}, 1fr)`;
-    }
-
-    appendToGridContainer(container) {
-        this.appendToParent(container);
-    }
-
-    addMouseEventListeners() {
-        this.addMouseOverEventListeners();
-        this.addMouseDownEventListener();
-        this.addMouseUpEventListener();
-    }
-
-    addMouseOverEventListeners() {
-        for (let id = 0; id < this.numberOfCells; id++) {
-            this.cells[id].div.addEventListener('mouseover', handleMouseOver.bind(this));
-        }
-    }
-
-    addMouseDownEventListener() {
-        this.gridContainerDiv.addEventListener('mousedown', handleMouseDown.bind(this));
-    }
-    
-    addMouseUpEventListener() {
-        this.gridContainerDiv.addEventListener('mouseup', handleMouseUp.bind(this));
     }
 
     setSideLength(newSideLength) {
@@ -57,7 +18,7 @@ class grid {
         this.currentColor = newColor;
     }
 
-    setPreviousColorToCurrent() {
+    saveCurrentColorAsPrevious() {
         this.previousColor = this.currentColor;
     }
 
@@ -69,10 +30,6 @@ class grid {
         for (let id = 0; id < this.numberOfCells; id++) {
             this.cells[id].setFillColor("#FFFFFF");
         }
-        if (this.buttonBoard.isPressed(this.eraserButton)) {
-            this.revertToPreviousColor();
-        }
-        this.buttonBoard.setButtonNotPressed(this.buttonBoard.eraserButton);
     }
 
     setMouseDownActive(event) {
@@ -104,21 +61,6 @@ class grid {
         let parentElement = this.cells[0].div.parentElement;
         parentElement.textContent = "";
     }
-
-    initColorPicker() {
-        let colorPicker = new iro.ColorPicker('.color-picker', {
-            width: 300,
-            color: "#000000",
-            borderWidth: 7,
-            borderColor: "#000000"
-        });
-    
-        return colorPicker;
-    }
-
-    addColorPickerEventListener() {
-        this.colorPicker.on('color:change', handleColorChange.bind(this));
-    }
 }
 
 class gridCell {
@@ -141,68 +83,143 @@ class gridCell {
     }
 }
 
-class buttonBoard {
-    constructor(relatedGrid) {
-        this.relatedGrid = relatedGrid;
-        this.clearButton = this.getClearButton();
-        this.sizeButton = this.getSizeButton();
-        this.eraserButton = this.getEraserButton();
-        this.colorButton = this.getColorButton();
-        this.addEventListeners();
+class controlButton {
+    constructor(cssClass, eventType, eventHandler, relatedPage) {
+        this.isPressed = false;
+        this.cssClass = cssClass;
+        this.eventType = eventType;
+        this.eventHandler = eventHandler;
+        this.relatedPage = relatedPage;
+        this.buttonElement = this.getButtonElement();
+        this.addEventListener();
     }
 
-    getClearButton() {
-        return document.querySelector(".clear-button");
+    getButtonElement() {
+        return document.querySelector(`.${this.cssClass}`);
     }
 
-    getSizeButton() {
-        return document.querySelector(".size-button");
+    addEventListener() {
+        this.buttonElement.addEventListener(`${this.eventType}`, this.eventHandler.bind(this.relatedPage));
     }
 
-    getEraserButton() {
-        return document.querySelector(".eraser-button");
-    }
-
-    getColorButton() {
-        return document.querySelector(".color-button");
-    }
-
-    addEventListeners() {
-        this.addClearButtonEventListener();
-        this.addSizeButtonEventListener();
-        this.addEraserButtonEventListener();
-        this.addColorButtonEventListener();
-    }
-
-    addClearButtonEventListener() {
-        this.clearButton.addEventListener('mouseup', handleClearClick.bind(this.relatedGrid));
-    }
-
-    addSizeButtonEventListener() {
-        this.sizeButton.addEventListener('click', handleSizeClick.bind(this.relatedGrid));
-    }
-
-    addEraserButtonEventListener() {
-        this.eraserButton.addEventListener('click', handleEraserClick.bind(this.relatedGrid));
-    }
-
-    addColorButtonEventListener() {
-        // this.colorButton.addEventListener('click', handleColorClick.bind(this.relatedGrid));
-    }
-
-    setButtonPressed(button) {
-        button.classList.add("pressed");
-    }
-
-    setButtonNotPressed(button) {
-        button.classList.remove("pressed");
-    }
-
-    isPressed(button) {
-        if (button.className == "pressed") {
-            return true;
+    togglePressed() {
+        if (this.isPressed) {
+            this.isPressed = false;
+            this.removeCssPressedClass();
+            return;
         }
-        return false;
+        this.isPressed = true;
+        this.addCssPressedClass();
+    }
+
+    addCssPressedClass() {
+        this.buttonElement.classList.add("pressed");
+    }
+
+    removeCssPressedClass() {
+        this.buttonElement.classList.remove("pressed");
+    }
+}
+
+class buttonBoard {
+    constructor(relatedPage) {
+        this.relatedPage = relatedPage;
+        this.clearButton = new controlButton('clear-button', 'mouseup', handleClearClick, this.relatedPage);
+        this.sizeButton = new controlButton('size-button', 'click', handleSizeClick, this.relatedPage);
+        this.eraserButton = new controlButton('eraser-button', 'click', handleEraserClick, this.relatedPage);
+        this.colorButton = new controlButton('color-button', 'click', handleColorClick, this.relatedPage);
+    }
+}
+
+class pageContent {
+    constructor(gridSize) {
+        this.pageGrid = new grid(gridSize);
+        this.attachGridToPage();
+        this.buttonBoard = new buttonBoard(this);
+        this.colorPicker = this.initColorPicker();
+        this.addColorPickerEventListener(this.colorPicker);
+        this.colorPickerVisible = false;
+    }
+    
+    attachGridToPage() {
+        this.gridContainerDiv = this.getGridContainerDiv();
+        this.setGridContainerSideLength(this.pageGrid.sideLength);
+        this.appendToGridContainer(this.gridContainerDiv);
+        this.addMouseEventListeners();
+    }
+
+    getGridContainerDiv() {
+        return document.querySelector(".grid-container");
+    }
+
+    setGridContainerSideLength(sideLength) {
+        this.gridContainerDiv.style["grid-template-columns"] = `repeat(${sideLength}, 1fr)`;
+    }
+
+    appendToGridContainer(container) {
+        this.pageGrid.appendToParent(container);
+    }
+
+    addMouseEventListeners() {
+        this.addMouseOverEventListeners();
+        this.addMouseDownEventListener();
+        this.addMouseUpEventListener();
+    }
+
+    addMouseOverEventListeners() {
+        for (let id = 0; id < this.pageGrid.numberOfCells; id++) {
+            this.pageGrid.cells[id].div.addEventListener('mouseover', handleMouseOver.bind(this.pageGrid));
+        }
+    }
+
+    addMouseDownEventListener() {
+        this.gridContainerDiv.addEventListener('mousedown', handleMouseDown.bind(this.pageGrid));
+    }
+    
+    addMouseUpEventListener() {
+        this.gridContainerDiv.addEventListener('mouseup', handleMouseUp.bind(this.pageGrid));
+    }
+
+    initColorPicker() {
+        let colorPicker = new iro.ColorPicker('.color-picker', {
+            width: 300,
+            color: "#000000",
+            borderWidth: 7,
+            borderColor: "#000000",
+            handleRadius: 15
+        });
+        this.hideColorPicker();
+    
+        return colorPicker;
+    }
+
+    addColorPickerEventListener() {
+        this.colorPicker.on('color:change', handleColorChange.bind(this));
+    }
+
+    toggleColorPickerVisibility() {
+        if(this.colorPickerVisible) {
+            this.hideColorPicker();
+            this.colorPickerVisible = false;
+        } 
+        else {
+            this.showColorPicker();
+            this.colorPickerVisible = true;
+        }
+    }
+
+    hideColorPicker() {
+        let colorPickerDiv = document.querySelector(".color-picker");
+        colorPickerDiv.style.display = "none";
+    }
+
+    showColorPicker() {
+        let colorPickerDiv = document.querySelector(".color-picker");
+        colorPickerDiv.style.display = "block";
+    }
+
+    createNewGrid(newSize) {
+        this.pageGrid = new grid(newSize);
     }
 }
 
@@ -222,40 +239,46 @@ function handleMouseUp(event) {
 }
 
 function handleClearClick(event) {
-    this.clearGrid();
+    this.pageGrid.clearGrid();
+    if (this.buttonBoard.eraserButton.isPressed) {
+        this.buttonBoard.eraserButton.togglePressed();
+        this.pageGrid.revertToPreviousColor();
+    }
 }
 
 function handleEraserClick(event) {
-    if (this.currentColor != "#FFFFFF") {
-        this.setPreviousColorToCurrent();
-        this.setCurrentColor("#FFFFFF");
-        this.buttonBoard.setButtonPressed(this.buttonBoard.eraserButton);
+    let eraserButton = this.buttonBoard.eraserButton;
+    if(eraserButton.isPressed) {
+        this.pageGrid.revertToPreviousColor();
     }
-    else if (this.currentColor == "#FFFFFF") {
-        this.revertToPreviousColor();
-        this.buttonBoard.setButtonNotPressed(this.buttonBoard.eraserButton);
+    else {
+        this.pageGrid.saveCurrentColorAsPrevious();
+        this.pageGrid.setCurrentColor("#FFFFFF");
     }
+    eraserButton.togglePressed();
 }
 
 function handleSizeClick(event) {
     let newSize = prompt("Enter the size of new grid square (1 to 100): ");
-    this.removeFromParent();
-    let newGrid = new grid(Number(newSize));
+    let oldCurrentColor = this.pageGrid.currentColor;
+    let oldPreviousColor = this.pageGrid.previousColor;
+    this.pageGrid.clearGrid();
+    this.pageGrid.removeFromParent();
+    this.createNewGrid(Number(newSize));
+    this.pageGrid.currentColor = oldCurrentColor;
+    this.pageGrid.previousColor = oldPreviousColor;
+    this.attachGridToPage();
+}
+
+function handleColorClick(event) {
+    this.buttonBoard.colorButton.togglePressed();
+    this.toggleColorPickerVisibility();
 }
 
 function handleColorChange(color) {
-    this.setCurrentColor(color.hexString);
-}
-
-function showColorPicker() {
-
-}
-
-function hideColorPicker() {
-
+    this.pageGrid.setCurrentColor(color.hexString);
 }
 
 const DEFAULT_GRID_SIDE_LENGTH = 16;
 
-let mainGrid = new grid(DEFAULT_GRID_SIDE_LENGTH);
-
+let mainPageContent = new pageContent(DEFAULT_GRID_SIDE_LENGTH);
