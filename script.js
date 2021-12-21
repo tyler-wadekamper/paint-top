@@ -188,7 +188,7 @@ class pageContent {
         let colorPicker = new iro.ColorPicker('.color-picker', {
             width: 200,
             color: "#000000",
-            borderWidth: 7,
+            borderWidth: 3,
             borderColor: "#000000",
             handleRadius: 10
         });
