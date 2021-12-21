@@ -128,6 +128,7 @@ class buttonBoard {
         this.sizeButton = new controlButton('size-button', 'click', handleSizeClick, this.relatedPage);
         this.eraserButton = new controlButton('eraser-button', 'click', handleEraserClick, this.relatedPage);
         this.colorButton = new controlButton('color-button', 'click', handleColorClick, this.relatedPage);
+        this.submitButton = new controlButton('submit-button', 'click', handleSubmitClick, this.relatedPage)
     }
 }
 
@@ -135,10 +136,13 @@ class pageContent {
     constructor(gridSize) {
         this.pageGrid = new grid(gridSize);
         this.attachGridToPage();
+        this.sizeInput = this.createSizeInput();
         this.buttonBoard = new buttonBoard(this);
         this.colorPicker = this.initColorPicker();
         this.addColorPickerEventListener(this.colorPicker);
         this.colorPickerVisible = false;
+        this.hideSizeInput();
+        this.sizeInputVisible = false;
     }
     
     attachGridToPage() {
@@ -182,11 +186,11 @@ class pageContent {
 
     initColorPicker() {
         let colorPicker = new iro.ColorPicker('.color-picker', {
-            width: 300,
+            width: 200,
             color: "#000000",
             borderWidth: 7,
             borderColor: "#000000",
-            handleRadius: 15
+            handleRadius: 10
         });
         this.hideColorPicker();
     
@@ -220,6 +224,50 @@ class pageContent {
 
     createNewGrid(newSize) {
         this.pageGrid = new grid(newSize);
+    }
+
+    toggleSizeInputVisiblity() {
+        if(this.sizeInputVisible) {
+            this.hideSizeInput();
+            this.sizeInputVisible = false;
+        } 
+        else {
+            this.showSizeInput();
+            this.sizeInputVisible = true;
+        }
+    }
+
+    hideSizeInput() {
+        let sizeInputDiv = document.querySelector(".size-window");
+        sizeInputDiv.style.display = "none";
+    }
+
+    showSizeInput() {
+        let sizeInputDiv = document.querySelector(".size-window");
+        sizeInputDiv.style.display = "flex";
+    }
+
+    createSizeInput() {
+        let sizeContainerDiv = document.querySelector('.size-container');
+
+        let sizeInputDiv = document.createElement('div');
+        sizeInputDiv.classList.add('size-window');
+
+        let sizeInput = document.createElement('input');
+        sizeInput.classList.add('size-input');
+        sizeInput.setAttribute('placeholder', 'Grid size (2-100)');
+        sizeInput.setAttribute('defaultValue', '16');
+
+        let sizeSubmitButton = document.createElement('button');
+        sizeSubmitButton.setAttribute('type', 'submit');
+        sizeSubmitButton.classList.add('submit-button');
+        sizeSubmitButton.textContent = 'SUBMIT';
+
+        sizeContainerDiv.appendChild(sizeInputDiv);
+        sizeInputDiv.appendChild(sizeInput);
+        sizeInputDiv.appendChild(sizeSubmitButton);
+
+        return sizeInput;
     }
 }
 
@@ -259,15 +307,26 @@ function handleEraserClick(event) {
 }
 
 function handleSizeClick(event) {
-    let newSize = prompt("Enter the size of new grid square (1 to 100): ");
-    let oldCurrentColor = this.pageGrid.currentColor;
-    let oldPreviousColor = this.pageGrid.previousColor;
-    this.pageGrid.clearGrid();
-    this.pageGrid.removeFromParent();
-    this.createNewGrid(Number(newSize));
-    this.pageGrid.currentColor = oldCurrentColor;
-    this.pageGrid.previousColor = oldPreviousColor;
-    this.attachGridToPage();
+    this.buttonBoard.sizeButton.togglePressed();
+    this.toggleSizeInputVisiblity();
+}
+
+function handleSubmitClick(event) {
+    let newSize = Number(this.sizeInput.value);
+
+    if ((newSize > 1) && (newSize < 101) && (newSize % 1 == 0)) {
+        let oldCurrentColor = this.pageGrid.currentColor;
+        let oldPreviousColor = this.pageGrid.previousColor;
+        this.pageGrid.clearGrid();
+        this.pageGrid.removeFromParent();
+        this.createNewGrid(Number(newSize));
+        this.pageGrid.currentColor = oldCurrentColor;
+        this.pageGrid.previousColor = oldPreviousColor;
+        this.attachGridToPage();
+    }
+    else {
+        alert("Your grid size input was invalid. Please enter an integer between 2 and 100.");
+    }
 }
 
 function handleColorClick(event) {
@@ -277,6 +336,9 @@ function handleColorClick(event) {
 
 function handleColorChange(color) {
     this.pageGrid.setCurrentColor(color.hexString);
+    if (this.buttonBoard.eraserButton.isPressed) {
+        this.buttonBoard.eraserButton.togglePressed();
+    }
 }
 
 const DEFAULT_GRID_SIDE_LENGTH = 16;

@@ -1,37 +1,32 @@
-.flex {
-    display: flex;
-}
-
 body {
     justify-content: space-between;
     flex-direction: column;
     background-color: #FBF304;
     min-height: 100vh;
     margin: 0px;
-    gap: 80px;
+    gap: 20px;
+    display: flex;
 }
 
 .header {
     color: white;
     background-color: black;
-    padding: 1em;
-    font-size: 72px;
+    padding: 20px;
+    font-size: 42px;
     text-align: center;
     font-weight: bolder;
-}
-
-.body-child {
-    flex: 0;
+    flex: 0 1 auto;
 }
 
 button {
     background-color: #FBF304;
-    border: solid black 7px;
+    border: solid black 3px;
     color: black;
-    border-radius: 5px;
-    font-size: 24px;
+    border-radius: 3px;
+    font-size: 16px;
     font-weight: bolder;
-    padding: 10px 25px;
+    padding: 10px;
+    width: 100px;
     flex: 0;
 }
 
@@ -40,19 +35,25 @@ button:hover, .pressed {
     color: white;
 }
 
+.main-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex: 1 1 auto;
+    align-self: stretch;
+}
+
 .footer {
-    flex: 0 0 auto;
-    height: 300px;
+    flex: 0 1 auto;
+    height: 200px;
     align-self: end;
-    position: relative;
-    bottom: 274px;
 }
 
 .grid-container {
-    border: solid black 7px;
-    border-radius: 7px;
-    width: 784px;
-    height: 784px;
+    border: solid black 3px;
+    border-radius: 3px;
+    width: 576px;
+    height: 576px;
     display: grid;
 }
 
@@ -65,31 +66,53 @@ button:hover, .pressed {
     -ms-user-select: none;
 }
 
-/* .grid-cell:hover {
-    border: solid #b5b5b5 1px;
-} */
 
-.main-container {
-    justify-self: center;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.flex-item {
-    flex: 1;
+.button-container {
+    flex: 0 0 auto;
 }
 
 .left-column-container, .right-column-container {
-    display: inline-block;
     flex-direction: column;
     gap: 20px;
     display: flex;
     align-items: flex-end;
+    flex-basis: content;
+    flex: 0;
 }
 
 .color-picker {
     background-color:#FBF304;
     padding: 20px;
     border-radius: 7px;
+}
+
+.size-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: end;
+}
+
+.size-input {
+    flex: 0 0 auto;
+    font-size: 16px;
+    background-color: white;
+    border: solid black 3px;
+    color: black;
+    border-radius: 3px;
+    font-weight: bolder;
+    width: 9em;
+    height: 2em;
+    background-color: #fffeda;
+}
+
+.size-window {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    gap: 10px;
+    padding: 30px;
+    border: solid blaCK 3px;
+    border-radius: 3px;
+    background-color: white;
 }
